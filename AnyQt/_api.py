@@ -16,8 +16,6 @@ else:
 USED_API = None
 
 QT_API_PYQT5 = "pyqt5"
-QT_API_PYQT4 = "pyqt4"
-QT_API_PYSIDE = "pyside"
 QT_API_PYSIDE2 = "pyside2"
 
 def comittoapi(api):
@@ -29,8 +27,8 @@ def comittoapi(api):
     """
     global USED_API
     assert USED_API is None, "committoapi called again!"
-    check = ["PyQt4", "PyQt5", "PySide", "PySide2"]
-    assert api in [QT_API_PYQT5, QT_API_PYQT4, QT_API_PYSIDE, QT_API_PYSIDE2]
+    check = ["PyQt5", "PySide2"]
+    assert api in [QT_API_PYQT5, QT_API_PYSIDE2]
     for name in check:
         if name.lower() != api and name in sys.modules:
             raise RuntimeError(
@@ -47,11 +45,7 @@ if AnyQt.__SELECTED_API is not None:
     comittoapi(AnyQt.__SELECTED_API)
 elif "QT_API" in os.environ:
     api = os.environ["QT_API"].lower()
-    if api == "pyqt":
-        # Qt.py allows both pyqt4 and pyqt to specify PyQt4.
-        # When run from anaconda-navigator, pyqt is used.
-        api = "pyqt4"
-    if api in [QT_API_PYQT4, QT_API_PYQT5, QT_API_PYSIDE, QT_API_PYSIDE2]:
+    if api in [QT_API_PYQT5, QT_API_PYSIDE2]:
         comittoapi(api)
     else:
         warnings.warn(
@@ -65,12 +59,8 @@ if USED_API is None:
     __existing = None
     if "PyQt5" in sys.modules:
         __existing = QT_API_PYQT5
-    elif "PyQt4" in sys.modules:
-        __existing = QT_API_PYQT4
     elif "PySide2" in sys.modules:
         __existing = QT_API_PYSIDE2
-    elif "PySide" in sys.modules:
-        __existing = QT_API_PYSIDE
 
     if __existing is not None:
         comittoapi(__existing)
@@ -83,10 +73,6 @@ if USED_API is None:
             __available = AnyQt.__PREFERRED_API.lower()
         elif "PyQt5" in available:
             __available = QT_API_PYQT5
-        elif "PyQt4" in available:
-            __available = QT_API_PYQT4
-        elif "PySide" in available:
-            __available = QT_API_PYSIDE
         elif "PySide2" in available:
             __available = QT_API_PYSIDE2
 

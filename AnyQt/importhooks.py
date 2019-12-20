@@ -2,7 +2,7 @@ import sys
 import warnings
 
 from ._api import (
-    USED_API, QT_API_PYQT4, QT_API_PYQT5, QT_API_PYSIDE
+    USED_API, QT_API_PYQT5
 )
 
 
@@ -16,14 +16,6 @@ class ImportHookBackport(object):
 
     def find_module(self, name, path=None):
         if USED_API != QT_API_PYQT5:
-            return
-
-        toplevel = name.split(".", 1)[0]
-        if toplevel == "PyQt4" and self.whichapi == QT_API_PYQT4:
-            return self
-        elif toplevel == "PySide" and self.whichapi == QT_API_PYSIDE:
-            return self
-        else:
             return
 
     def load_module(self, fullname):
@@ -64,10 +56,6 @@ class ImportHookDeny(object):
     def find_module(self, name, path=None):
         toplevel = name.split(".")[0]
         if self.whichapi == QT_API_PYQT5 and toplevel == "PyQt5":
-            return self
-        elif self.whichapi == QT_API_PYQT4 and toplevel == "PyQt4":
-            return self
-        elif self.whichapi == QT_API_PYSIDE and toplevel == "PySide":
             return self
         else:
             return None

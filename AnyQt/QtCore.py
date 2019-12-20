@@ -195,53 +195,7 @@ __Qt4_QtCore = [
     'ws'
 ]
 
-# Extra PyQt4 defined names mapped from PyQt4 which are not present in
-# PySide
-__PyQt4_QtCore = [
-    'PYQT_CONFIGURATION',
-    'PYQT_VERSION',
-    'PYQT_VERSION_STR',
-    'pyqtBoundSignal',
-    'pyqtPickleProtocol',
-    'pyqtProperty',
-    'pyqtRemoveInputHook',
-    'pyqtRestoreInputHook',
-    'pyqtSetPickleProtocol',
-    'pyqtSignal',
-    'pyqtSignature',
-    'pyqtSlot',
-    'pyqtWrapperType',
-]
 
-# List names imported from Qt4's QtGui module
-__Qt4_QtGui = [
-    'QAbstractProxyModel',
-    'QIdentityProxyModel',
-    'QItemSelection',
-    'QItemSelectionModel',
-    'QItemSelectionRange',
-    'QSortFilterProxyModel',
-    'QStringListModel',
-]
-
-#: Names in Qt4's QtCore module not in Qt5
-__Qt4_QtCore_missing_in_Qt5 = [
-    'QAbstractFileEngine',
-    'QAbstractFileEngineHandler',
-    'QAbstractFileEngineIterator',
-    'QFSFileEngine',
-    'QPyNullVariant',
-    'QSystemLocale',
-    'SIGNAL',
-    'SLOT',
-    'qInstallMsgHandler',
-    'qSwap'
-]
-
-# extra names in PyQt4's QtCore not in Qt5
-__PyQt4_QtCore_missing_in_Qt5 = [
-    'pyqtSignature',
-]
 
 if _api.USED_API == _api.QT_API_PYQT5:
     from PyQt5.QtCore import *
@@ -249,55 +203,6 @@ if _api.USED_API == _api.QT_API_PYQT5:
     Slot = pyqtSlot
     Property = pyqtProperty
 
-elif _api.USED_API == _api.QT_API_PYQT4:
-    from PyQt4 import QtCore as _QtCore, QtGui as _QtGui
-    globals().update(
-        {name: getattr(_QtCore, name)
-         for name in __Qt4_QtCore + __PyQt4_QtCore if hasattr(_QtCore, name)}
-    )
-    globals().update(
-        {name: getattr(_QtGui, name)
-         for name in __Qt4_QtGui if hasattr(_QtCore, name)}
-    )
-    Signal = _QtCore.pyqtSignal
-    Slot = _QtCore.pyqtSlot
-    Property = _QtCore.pyqtProperty
-
-    QAbstractProxyModel = _QtGui.QAbstractProxyModel
-    QIdentityProxyModel = _QtGui.QIdentityProxyModel
-    QItemSelection = _QtGui.QItemSelection
-    QItemSelectionModel = _QtGui.QItemSelectionModel
-    QItemSelectionRange = _QtGui.QItemSelectionRange
-    QSortFilterProxyModel = _QtGui.QSortFilterProxyModel
-    QStringListModel = _QtGui.QStringListModel
-    del _QtCore, _QtGui
-
-elif _api.USED_API == _api.QT_API_PYSIDE:
-    from PySide import QtCore as _QtCore, QtGui as _QtGui
-    globals().update(
-        {name: getattr(_QtCore, name)
-         for name in __Qt4_QtCore if hasattr(_QtCore, name)}
-    )
-    Signal = _QtCore.Signal
-    Slot = _QtCore.Slot
-    Property = _QtCore.Property
-
-    QAbstractProxyModel = _QtGui.QAbstractProxyModel
-    if hasattr(_QtGui, "QIdentityProxyModel"):
-        QIdentityProxyModel = _QtGui.QIdentityProxyModel
-    QItemSelection = _QtGui.QItemSelection
-    QItemSelectionModel = _QtGui.QItemSelectionModel
-    QItemSelectionRange = _QtGui.QItemSelectionRange
-    QSortFilterProxyModel = _QtGui.QSortFilterProxyModel
-    QStringListModel = _QtGui.QStringListModel
-
-    _major, _minor, _micro = tuple(map(int, _QtCore.qVersion().split(".")[:3]))
-    QT_VERSION = (_major << 16) + (_minor << 8) + _micro
-    QT_VERSION_STR = "{}.{}.{}".format(_major, _minor, _micro)
-
-    del _QtCore, _QtGui, _major, _minor, _micro
-    # Known to be in PyQt4 but missing in PySide:
-    #     Q_ARG, Q_CLASSINFO, Q_ENUMS, Q_FLAGS, Q_RETURN_ARG, ...
 elif _api.USED_API == _api.QT_API_PYSIDE2:
     from PySide2.QtCore import *
 

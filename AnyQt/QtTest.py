@@ -2,10 +2,6 @@ from . import _api
 
 if _api.USED_API == _api.QT_API_PYQT5:
     from PyQt5.QtTest import *
-elif _api.USED_API == _api.QT_API_PYQT4:
-    from PyQt4.QtTest import *
-elif _api.USED_API == _api.QT_API_PYSIDE:
-    from PySide.QtTest import *
 elif _api.USED_API == _api.QT_API_PYSIDE2:
     from PySide2.QtTest import *
 
@@ -63,64 +59,3 @@ def _QTest_qWaitForWindowActive(widget, timeout=1000):
 
     return window.isActiveWindow()
 
-
-if _api.USED_API in {_api.QT_API_PYQT4, _api.QT_API_PYSIDE}:
-    QTest.qWaitForWindowExposed = _QTest_qWaitForWindowExposed
-    QTest.qWaitForWindowActive = _QTest_qWaitForWindowActive
-
-    from AnyQt.QtCore import QObject, QByteArray as _QByteArray
-
-    # not exposed in PyQt4 or PySide. Going by PyQt5 interface
-    class QSignalSpy(QObject):
-        """
-        QSignalSpy(boundsignal)
-        """
-        def __init__(self, boundsig, **kwargs):
-            super(QSignalSpy, self).__init__(**kwargs)
-            from AnyQt.QtCore import QEventLoop, QTimer
-            self.__boundsig = boundsig
-            self.__recorded = recorded = []  # type: List[List[Any]]
-            self.__loop = loop = QEventLoop()
-            self.__timer = QTimer(self, singleShot=True)
-            self.__timer.timeout.connect(self.__loop.quit)
-
-            def record(*args):
-                # Record the emitted arguments and quit the loop if running.
-                # NOTE: not capturing self from parent scope
-                recorded.append(list(args))
-                if loop.isRunning():
-                    loop.quit()
-            # Need to keep reference at least for PyQt4 4.11.4, sip 4.16.9 on
-            # python 3.4 (if the signal is emitted during gc collection, and
-            # the boundsignal is a QObject.destroyed signal).
-            self.__record = record
-            boundsig.connect(record)
-
-        def signal(self):
-            return _QByteArray(self.__boundsig.signal[1:].encode("latin-1"))
-
-        def isValid(self):
-            return True
-
-        def wait(self, timeout=5000):
-            count = len(self)
-            self.__timer.stop()
-            self.__timer.setInterval(timeout)
-            self.__timer.start()
-            self.__loop.exec_()
-            self.__timer.stop()
-            return len(self) != count
-
-        def __getitem__(self, index):
-            return self.__recorded[index]
-
-        def __setitem__(self, index, value):
-            self.__recorded.__setitem__(index, value)
-
-        def __delitem__(self, index):
-            self.__recorded.__delitem__(index)
-
-        def __len__(self):
-            return len(self.__recorded)
-
-    del QObject

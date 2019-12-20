@@ -136,49 +136,6 @@ __Qt4_QtGui = [
 
 if _api.USED_API == _api.QT_API_PYQT5:
     from PyQt5.QtGui import *
-elif _api.USED_API == _api.QT_API_PYQT4:
-    import PyQt4.QtGui as _QtGui
-    globals().update(
-        {name: getattr(_QtGui, name)
-         for name in __Qt4_QtGui if hasattr(_QtGui, name)}
-    )
-    del _QtGui
-elif _api.USED_API == _api.QT_API_PYSIDE:
-    from PySide import QtGui as _QtGui
-    globals().update(
-        {name: getattr(_QtGui, name)
-         for name in __Qt4_QtGui if hasattr(_QtGui, name)}
-    )
-    del _QtGui
-    # Known to be present in PyQt4 but not in PySide:
-    #   QGlyphRun, QRawFont, QStaticText, QTextDocumentWriter
 elif _api.USED_API == _api.QT_API_PYSIDE2:
     from PySide2.QtGui import *
-
-if _api.USED_API in [_api.QT_API_PYQT4, _api.QT_API_PYSIDE]:
-    from AnyQt import QtCore as __QtCore
-
-    def __QWheelEvent_angleDelta(self):
-        """
-        Qt5 compatible QWheelEvent.angleDelta
-
-        Return the delta as an x or y axis aligned QPoint vector
-        """
-        if self.orientation() == __QtCore.Qt.Horizontal:
-            return __QtCore.QPoint(self.delta(), 0)
-        else:
-            return __QtCore.QPoint(0, self.delta())
-
-    def __QWheelEvent_pixelDelta(self):
-        """
-        Qt5 compatible QWheelEvent.pixelDelta
-
-        Always return a null QPoint. This is acceptable and compatible with
-        the API (i.e. the pixelDelta is only supported on platforms where
-        high resolution is available).
-        """
-        return __QtCore.QPoint()
-
-    QWheelEvent.angleDelta = __QWheelEvent_angleDelta
-    QWheelEvent.pixelDelta = __QWheelEvent_pixelDelta
 
